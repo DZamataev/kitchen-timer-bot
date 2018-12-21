@@ -1,0 +1,18 @@
+{
+  "name": "abot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "docker-compose up -d --build",
+    "undeploy": "docker-compose down",
+    "dev": "nodemon --exec \"npm start\""
+  },
+  "dependencies": {
+    "telegraf": "^3.25.5",
+    "telegraf-i18n": "^6.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  }
+}
