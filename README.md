@@ -4,7 +4,7 @@
 
 # How to use existing bot
 
-Find @kitchen_timer_bot on Telegram or follow ![this link.](https://t.me/kitchen_timer_bot)
+Find @kitchen_timer_bot on Telegram or follow [this link.](https://t.me/kitchen_timer_bot)
 
 # How to run your own
 
