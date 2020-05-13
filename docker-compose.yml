@@ -1,9 +1,0 @@
-version: '3.6'
-services:
-
-  bot:
-    build: abot/.
-    image: abot/kitchen-timer-bot
-    #environment:
-      # HTTP_API_TOKEN: YOUR_API_TOKEN
-    restart: always

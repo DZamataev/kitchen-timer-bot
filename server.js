@@ -1,40 +1,25 @@
-const path = require("path");
-const config = require('./config')
+//Don't sleep
+const http = require("http");
+const express = require("express");
+const app = express();
+app.get("/", (request, response) => {
+  console.log(Date.now() + " Ping Received");
+  response.sendStatus(200);
+});
+app.listen(process.env.PORT);
+setInterval(() => {
+  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 240000);
 
 const Telegraf = require('telegraf')
 const { Extra, Markup } = Telegraf
 const session = require('telegraf/session')
 
-const TelegrafI18n = require('telegraf-i18n')
-
 var m_activeContexts = {}
 
-// Safe get
-const get = (path, object) =>
-    path.reduce((xs, x) =>
-        (xs && xs[x]) ? xs[x] : null, object)
-
 // Bot creation
-const bot = new Telegraf(config.HTTP_API_TOKEN)
+const bot = new Telegraf(process.env.BOT_TOKEN)
 bot.use(session())
-
-// 2) Localization support
-/* 
-yaml and json are ok
-Example directory structure:
-├── locales
-│   ├── en.yaml
-│   ├── en-US.yaml
-│   ├── it.json
-│   └── ru.yaml
-└── bot.js
-*/
-const i18n = new TelegrafI18n({
-    defaultLanguage: 'en',
-    allowMissing: true,
-    directory: path.resolve(__dirname, 'locales')
-})
-bot.use(i18n.middleware())
 
 bot.use((ctx, next) => {
     console.log('Message from user', ctx.chat.username, 'recieved:', ctx.message.text)
@@ -46,7 +31,7 @@ bot.use((ctx, next) => {
 })
 
 bot.start((ctx) => {
-    ctx.reply(ctx.i18n.t('start'))
+    ctx.reply('A simple timer bot. Enter /x to create a new timer, where x is number of minutes')
 })
 
 bot.command('stop', (ctx) => {
