@@ -9,7 +9,8 @@ app.get("/", (request, response) => {
 app.listen(process.env.PORT);
 setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
-}, 100000);
+}, 240000);
+
 
 const Telegraf = require("telegraf");
 const { Extra, Markup } = Telegraf;
@@ -21,7 +22,7 @@ var m_activeContexts = {};
 const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.use(session());
 
-bot.use((ctx, next) => {
+/*bot.use((ctx, next) => {
   console.log(
     "Message from user",
     ctx.chat.username,
@@ -33,7 +34,7 @@ bot.use((ctx, next) => {
     return ctx.reply("session wiped").then(() => next(ctx));
   }
   return next(ctx);
-});
+});*/
 
 
 bot.start(ctx => {
@@ -94,11 +95,6 @@ bot.command(ctx => {
 });
 
 const intervalHandler = ctx => {
-     /*const markup = ctx.telegram.inlineKeyboard([
-          [
-            ctx.telegram.inlineButton("Cancel", { callback_data: "/cancel" })
-          ]
-        ]);*/
   var reply = "";
   var invalidatedCount = 0;
   ctx.session.timers.forEach(t => {
@@ -107,17 +103,17 @@ const intervalHandler = ctx => {
       if (!t.invalidated) {
         t.invalidated = true;
         ctx.telegram.sendMessage(ctx.chat.id, 
-          "⏳Time's up:" +
-            (t.label.length > 0 ? " " + t.label : "") +
-            " " +
-            millisToMinutesAndSeconds(t.time), {reply_to_message_id: `${ctx.message.message_id}`}
+          "⌛️Time's up:<b>" +
+            (t.label.length > 0 ? " " + t.label : " ") +
+            " in " +
+            millisToMinutesAndSeconds(t.time) + "</b>", {parse_mode: 'HTML', reply_to_message_id: `${ctx.message.message_id}`}
         );
       }
     }
     reply +=
-      `\n${ctx.message.from.first_name} set a timer: ` + "<b>⏳" +
+      `\n${ctx.message.from.first_name}: ` + "<b>⏳" +
       millisToMinutesAndSeconds(timeRest) +
-      (t.label.length > 0 ? ` — ${t.label}` : "</b>") +
+      (t.label.length > 0 ? ` — ${t.label}</b>` : "</b>") +
       (t.invalidated ? " <i>Expired</i>" : "");
 
     if (t.invalidated) {
@@ -133,7 +129,7 @@ const intervalHandler = ctx => {
         ctx.session.editInlineMessageId,
         reply,
         {parse_mode: 'html',
-        reply_markup: {inline_keyboard: [[{text: 'Cancel', callback_data:'cancel'},],]} } 
+        reply_markup: {inline_keyboard: [[{text: '🛑 Stop', callback_data:'cancel'},],]} } 
       );
     } else {
       var options = {parse_mode: 'html', reply_to_message_id: `${ctx.message.message_id}`}
@@ -166,10 +162,11 @@ bot.telegram.getMe().then(bot_informations => {
   );
 });
 
-bot.on("callbackQuery", ctx => {
-  if(ctx.data === "cancel") {
+bot.action("cancel", ctx => {
+  ctx.answerCbQuery("Stopped all timers.")
+  if(ctx.match === "cancel") {
     stopTimers(ctx);
-    return ctx.reply("Cleared all timers."); 
+  ctx.editMessageText("⏳Timer(s) stopped 🛑")
   }
     
 });

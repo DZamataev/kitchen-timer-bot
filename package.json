@@ -13,7 +13,7 @@
     "express": "^4.17.1",
     "telegraf": "^3.38.0",
     "telegram-bot-api": "^1.3.3",
-    "slimbot": "^4.7.0"
+    "slimbot": "^4.8.0"
   },
   "engines": {
     "node": "12.x"
