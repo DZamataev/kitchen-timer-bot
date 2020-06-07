@@ -22,6 +22,7 @@ var m_activeContexts = {};
 const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.use(session());
 
+
 /*bot.use((ctx, next) => {
   console.log(
     "Message from user",
@@ -44,8 +45,16 @@ bot.start(ctx => {
 });
 
 bot.help(ctx => {
-  ctx.reply(
-    "I am a simple timer bot. Enter /x to create a new timer, where x is the number of minutes till the timer runs out."
+  ctx.telegram.sendMessage(ctx.chat.id,
+    `I am a simple timer bot. 
+
+How to use Simple Timer:
+
+Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
+However, you can create multiple timers using the same command and have them running simultaneously.
+
+For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
+`, {parse_mode: "HTML"}
   );
 });
 
@@ -101,20 +110,22 @@ const intervalHandler = ctx => {
     var timeRest = t.end - Date.now();
     if (timeRest <= 0) {
       if (!t.invalidated) {
+        //stopTimers(ctx)
+        //ctx.editMessageText("⏳Timer(s) stopped 🛑")
         t.invalidated = true;
         ctx.telegram.sendMessage(ctx.chat.id, 
           "⌛️Time's up:<b>" +
             (t.label.length > 0 ? " " + t.label : " ") +
-            " in " +
+            " " +
             millisToMinutesAndSeconds(t.time) + "</b>", {parse_mode: 'HTML', reply_to_message_id: `${ctx.message.message_id}`}
         );
       }
     }
     reply +=
-      `\n${ctx.message.from.first_name}: ` + "<b>⏳" +
+      `\n\n${ctx.message.from.first_name}: ` + "<b>⏳" +
       millisToMinutesAndSeconds(timeRest) +
       (t.label.length > 0 ? ` — ${t.label}</b>` : "</b>") +
-      (t.invalidated ? " <i>Expired</i>" : "");
+      (t.invalidated ? " ✅" : "");
 
     if (t.invalidated) {
       invalidatedCount++;
@@ -129,7 +140,7 @@ const intervalHandler = ctx => {
         ctx.session.editInlineMessageId,
         reply,
         {parse_mode: 'html',
-        reply_markup: {inline_keyboard: [[{text: '🛑 Stop', callback_data:'cancel'},],]} } 
+        reply_markup: {inline_keyboard: [[{text: '🔴 Stop', callback_data:'cancel'},],]} } 
       );
     } else {
       var options = {parse_mode: 'html', reply_to_message_id: `${ctx.message.message_id}`}
@@ -166,16 +177,17 @@ bot.action("cancel", ctx => {
   ctx.answerCbQuery("Stopped all timers.")
   if(ctx.match === "cancel") {
     stopTimers(ctx);
-  ctx.editMessageText("⏳Timer(s) stopped 🛑")
+  ctx.editMessageText("⏳Timer(s) stopped 🔴")
   }
     
 });
 
 function millisToMinutesAndSeconds(millis) {
   //var minus = millis < 0 ? "-" : "";
-  millis = Math.abs(millis);
+  //millis = Math.abs(millis);
   var minutes = Math.floor(millis / 60000);
   var seconds = ((millis % 60000) / 1000).toFixed(0);
+  if(millis > 0) {
   return (
     (minutes < 10 ? "0" : "") +
     minutes +
@@ -183,6 +195,9 @@ function millisToMinutesAndSeconds(millis) {
     (seconds < 10 ? "0" : "") +
     seconds
   );
+  }
+  else if(millis < 0 ) return "00:00"
+  else return "00:00"
 }
 
 function stopTimers(ctx) {
