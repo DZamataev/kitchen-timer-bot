@@ -39,8 +39,16 @@ bot.use(session());
 
 
 bot.start(ctx => {
-  ctx.reply(
-    "I am a simple timer bot. Enter /x to create a new timer, where x is the number of minutes till the timer runs out."
+ctx.telegram.sendMessage(ctx.chat.id,
+    `I am a simple timer bot. 
+
+Usage:
+
+Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
+However, you can create multiple timers using the same command and have them running simultaneously.
+
+For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
+`, {parse_mode: "HTML"}
   );
 });
 
@@ -48,7 +56,7 @@ bot.help(ctx => {
   ctx.telegram.sendMessage(ctx.chat.id,
     `I am a simple timer bot. 
 
-How to use Simple Timer:
+Usage:
 
 Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
 However, you can create multiple timers using the same command and have them running simultaneously.
@@ -60,16 +68,17 @@ For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>
 
 bot.command("stop", ctx => {
   stopTimers(ctx);
-  return ctx.reply("Cleared all timers.");
+  return ctx.reply("Stopped all timers.");
 });
 
 bot.command("cancel", ctx => {
   stopTimers(ctx);
-  return ctx.reply("Cleared all timers.");
+  return ctx.reply("Stopped all timers.");
 });
 
 bot.command(ctx => {
-
+  ctx.telegram.sendChatAction(ctx.chat.id,"typing");
+  n++;
   var msg = ctx.message.text;
   if (/^\/\d{1,5}/.test(msg)) {
     var match = msg.match(/^\/\d{1,5}/);
@@ -103,6 +112,8 @@ bot.command(ctx => {
   }
 });
 
+var n = -1;
+
 const intervalHandler = ctx => {
   var reply = "";
   var invalidatedCount = 0;
@@ -115,16 +126,16 @@ const intervalHandler = ctx => {
         t.invalidated = true;
         ctx.telegram.sendMessage(ctx.chat.id, 
           "⌛️Time's up:<b>" +
-            (t.label.length > 0 ? " " + t.label : " ") +
+            (t.label.length > 0 ? " " + t.label : "") +
             " " +
-            millisToMinutesAndSeconds(t.time) + "</b>", {parse_mode: 'HTML', reply_to_message_id: `${ctx.message.message_id}`}
+            millisToMinutesAndSeconds(t.time) + "</b><i> — no label</i>", {parse_mode: 'HTML', reply_to_message_id: `${ctx.message.message_id}`}
         );
       }
     }
     reply +=
-      `\n\n${ctx.message.from.first_name}: ` + "<b>⏳" +
+      "\n\n<b>⏳" +
       millisToMinutesAndSeconds(timeRest) +
-      (t.label.length > 0 ? ` — ${t.label}</b>` : "</b>") +
+      (t.label.length > 0 ? ` — ${t.label}</b>` : "</b><i> — no label</i>") +
       (t.invalidated ? " ✅" : "");
 
     if (t.invalidated) {
@@ -134,13 +145,14 @@ const intervalHandler = ctx => {
 
   if (reply.length > 0) {
     if (ctx.session.canEdit) {
+      //ctx.telegram.sendChatAction(ctx.chat.id,"typing")
       ctx.telegram.editMessageText(
         ctx.session.editMessageChatId,
         ctx.session.editMessageId,
         ctx.session.editInlineMessageId,
         reply,
         {parse_mode: 'html',
-        reply_markup: {inline_keyboard: [[{text: '🔴 Stop', callback_data:'cancel'},],]} } 
+        reply_markup: {inline_keyboard: [[{text: '🔴 Stop', callback_data:'stop'},],]} } 
       );
     } else {
       var options = {parse_mode: 'html', reply_to_message_id: `${ctx.message.message_id}`}
@@ -173,9 +185,9 @@ bot.telegram.getMe().then(bot_informations => {
   );
 });
 
-bot.action("cancel", ctx => {
+bot.action("stop", ctx => {
   ctx.answerCbQuery("Stopped all timers.")
-  if(ctx.match === "cancel") {
+  if(ctx.match === "stop") {
     stopTimers(ctx);
   ctx.editMessageText("⏳Timer(s) stopped 🔴")
   }
@@ -188,16 +200,23 @@ function millisToMinutesAndSeconds(millis) {
   var minutes = Math.floor(millis / 60000);
   var seconds = ((millis % 60000) / 1000).toFixed(0);
   if(millis > 0) {
-  return (
-    (minutes < 10 ? "0" : "") +
-    minutes +
+  var min = minutes //< 10 ? "0" : "") + minutes)
+  var sec = ((seconds < 10 ? "0" : "") + seconds )
+  
+  var result = (
+    min +
     ":" +
-    (seconds < 10 ? "0" : "") +
-    seconds
-  );
+    sec )
+  if (sec == 60) {
+    min = parseInt(min, 10);
+    min = min + 1
+    min = min.toString();
+    sec = "00";
   }
-  else if(millis < 0 ) return "00:00"
-  else return "00:00"
+  return ( min + ":" + sec );
+  }
+  else if(millis < 0 ) return "0:00"
+  else return "0:00"
 }
 
 function stopTimers(ctx) {
