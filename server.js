@@ -11,7 +11,6 @@ setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 240000);
 
-
 const Telegraf = require("telegraf");
 const { Extra, Markup } = Telegraf;
 const session = require("telegraf/session");
@@ -21,7 +20,6 @@ var m_activeContexts = {};
 // Bot creation
 const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.use(session());
-
 
 /*bot.use((ctx, next) => {
   console.log(
@@ -37,9 +35,9 @@ bot.use(session());
   return next(ctx);
 });*/
 
-
 bot.start(ctx => {
-ctx.telegram.sendMessage(ctx.chat.id,
+  ctx.telegram.sendMessage(
+    ctx.chat.id,
     `I am a simple timer bot. 
 
 Usage:
@@ -48,12 +46,14 @@ Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of 
 However, you can create multiple timers using the same command and have them running simultaneously.
 
 For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
-`, {parse_mode: "HTML"}
+`,
+    { parse_mode: "HTML" }
   );
 });
 
 bot.help(ctx => {
-  ctx.telegram.sendMessage(ctx.chat.id,
+  ctx.telegram.sendMessage(
+    ctx.chat.id,
     `I am a simple timer bot. 
 
 Usage:
@@ -62,30 +62,32 @@ Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of 
 However, you can create multiple timers using the same command and have them running simultaneously.
 
 For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
-`, {parse_mode: "HTML"}
+`,
+    { parse_mode: "HTML" }
   );
 });
 
 bot.command("stop", ctx => {
+  session.snooze = 0 
   stopTimers(ctx);
   return ctx.reply("Stopped all timers.");
 });
 
 bot.command("cancel", ctx => {
+  session.snooze = 0
   stopTimers(ctx);
   return ctx.reply("Stopped all timers.");
 });
 
 bot.command(ctx => {
-  ctx.telegram.sendChatAction(ctx.chat.id,"typing");
+  ctx.telegram.sendChatAction(ctx.chat.id, "typing");
   n++;
   var msg = ctx.message.text;
   if (/^\/\d{1,5}/.test(msg)) {
     var match = msg.match(/^\/\d{1,5}/);
     // create timer command
-    var label = " "
-    if(msg !== "")
-      var label = msg.substring(match[0].length).trim() || "";
+    var label = " ";
+    if (msg !== "") var label = msg.substring(match[0].length).trim() || "";
     var time = parseInt(match[0].substring(1));
     time = time * 60 * 1000;
 
@@ -113,22 +115,33 @@ bot.command(ctx => {
 });
 
 var n = -1;
+session.snooze = 0;
 
 const intervalHandler = ctx => {
   var reply = "";
   var invalidatedCount = 0;
   ctx.session.timers.forEach(t => {
-    var timeRest = t.end - Date.now();
+    if(session.snooze != 0) {
+      var timeRest = (t.end - Date.now()) + (session.snooze * 60000);
+    }
+    var timeRest = (t.end - Date.now()) + (session.snooze * 60000)
+    //console.log(timeRest)
     if (timeRest <= 0) {
       if (!t.invalidated) {
         //stopTimers(ctx)
         //ctx.editMessageText("⏳Timer(s) stopped 🛑")
         t.invalidated = true;
-        ctx.telegram.sendMessage(ctx.chat.id, 
+        ctx.telegram.sendMessage(
+          ctx.chat.id,
           "⌛️Time's up:<b>" +
             (t.label.length > 0 ? " " + t.label : "") +
             " " +
-            millisToMinutesAndSeconds(t.time) + "</b><i> — no label</i>", {parse_mode: 'HTML', reply_to_message_id: `${ctx.message.message_id}`}
+            millisToMinutesAndSeconds(t.time) +
+            "</b><i> — no label</i>",
+          {
+            parse_mode: "HTML",
+            reply_to_message_id: `${ctx.message.message_id}`
+          }
         );
       }
     }
@@ -151,11 +164,21 @@ const intervalHandler = ctx => {
         ctx.session.editMessageId,
         ctx.session.editInlineMessageId,
         reply,
-        {parse_mode: 'html',
-        reply_markup: {inline_keyboard: [[{text: '🔴 Stop', callback_data:'stop'},],]} } 
+        {
+          parse_mode: "html",
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: "🔴 Stop", callback_data: "stop" }],
+              [{ text: "💤 Snooze", callback_data: "snooze" }]
+            ]
+          }
+        }
       );
     } else {
-      var options = {parse_mode: 'html', reply_to_message_id: `${ctx.message.message_id}`}
+      var options = {
+        parse_mode: "html",
+        reply_to_message_id: `${ctx.message.message_id}`
+      };
       ctx.telegram.sendMessage(ctx.chat.id, reply, options).then(replyCtx => {
         ctx.session.editMessageId = replyCtx.message_id;
         ctx.session.editInlineMessageId = replyCtx.inline_message_id;
@@ -186,37 +209,41 @@ bot.telegram.getMe().then(bot_informations => {
 });
 
 bot.action("stop", ctx => {
-  ctx.answerCbQuery("Stopped all timers.")
-  if(ctx.match === "stop") {
+  ctx.answerCbQuery("Stopped all timers.");
+  if (ctx.match === "stop") {
     stopTimers(ctx);
-  ctx.editMessageText("⏳Timer(s) stopped 🔴")
+    ctx.editMessageText("⏳Timer(s) stopped 🔴");
   }
-    
+  session.snooze = 0
 });
+
+bot.action("snooze", ctx => {
+  session.snooze = session.snooze + 10;
+  ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
+});
+
+
+
 
 function millisToMinutesAndSeconds(millis) {
   //var minus = millis < 0 ? "-" : "";
   //millis = Math.abs(millis);
-  var minutes = Math.floor(millis / 60000);
+  var minutes = Math.floor(millis / 60000)
   var seconds = ((millis % 60000) / 1000).toFixed(0);
-  if(millis > 0) {
-  var min = minutes //< 10 ? "0" : "") + minutes)
-  var sec = ((seconds < 10 ? "0" : "") + seconds )
-  
-  var result = (
-    min +
-    ":" +
-    sec )
-  if (sec == 60) {
-    min = parseInt(min, 10);
-    min = min + 1
-    min = min.toString();
-    sec = "00";
-  }
-  return ( min + ":" + sec );
-  }
-  else if(millis < 0 ) return "0:00"
-  else return "0:00"
+  if (millis > 0) {
+      var min = minutes; //< 10 ? "0" : "") + minutes)
+    var sec = (seconds < 10 ? "0" : "") + seconds;
+
+    var result = min + ":" + sec;
+    if (sec == 60) {
+      min = parseInt(min, 10);
+      min = min + 1;
+      min = min.toString();
+      sec = "00";
+    }
+    return min + ":" + sec;
+  } else if (millis < 0) return "0:00";
+  else return "0:00";
 }
 
 function stopTimers(ctx) {
