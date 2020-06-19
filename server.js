@@ -7,9 +7,9 @@ app.get("/", (request, response) => {
   response.sendStatus(200);
 });
 app.listen(process.env.PORT);
-setInterval(() => {
+/*setInterval(() => {
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
-}, 240000);
+}, 240000);*/
 
 const Telegraf = require("telegraf");
 const { Extra, Markup } = Telegraf;
