@@ -172,8 +172,10 @@ const intervalHandler = ctx => {
           parse_mode: "html",
           reply_markup: {
             inline_keyboard: [
-              [{ text: "🔴 Stop", callback_data: "stop" }],
-              [{ text: "💤 Snooze", callback_data: "snooze" }]
+              [
+                { text: "🔴 Stop", callback_data: "stop" },
+                { text: "💤 Snooze", callback_data: "snooze" } 
+              ],
             ]
           }
         }
