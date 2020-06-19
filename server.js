@@ -128,7 +128,7 @@ const intervalHandler = ctx => {
     if(session.snooze != 0) {
       var timeRest = (t.end - Date.now()) + (session.snooze * 60000);
     }
-    var timeRest = (t.end - Date.now()) + (session.snooze * 60000)
+    var timeRest = (t.end - Date.now()) //+ (session.snooze * 60000)
     //console.log(timeRest)
     if (timeRest <= 0) {
       if (!t.invalidated) {
