@@ -11,6 +11,10 @@ app.listen(process.env.PORT);
   http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
 }, 240000);*/
 
+const BOT_TOKEN = process.env.BOT_TOKEN || "";
+const PORT = process.env.PORT || 3000;
+const URL = process.env.URL || "https://simpletimer-bot.herokuapp.com/";
+
 const Telegraf = require("telegraf");
 const { Extra, Markup } = Telegraf;
 const session = require("telegraf/session");
@@ -264,9 +268,8 @@ function getSessionKey(ctx) {
   return null;
 }
 
-/*bot.telegram.setWebhook(`${process.env.URL}/bot${process.env.BOT_TOKEN}`);
-bot.startWebhook(`/bot${process.env.BOT_TOKEN}`, null, process.env.PORT);
+bot.telegram.setWebhook(`${URL}/bot${BOT_TOKEN}`);
+bot.startWebhook(`/bot${BOT_TOKEN}`, null, PORT);
 bot.launch();
-*/
 //Start bot polling in order to not terminate Node.js application.
-bot.startPolling();
+//bot.startPolling();
