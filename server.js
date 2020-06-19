@@ -13,7 +13,7 @@ app.listen(process.env.PORT);
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 const PORT = process.env.PORT || 3000;
-const URL = process.env.URL || "https://simpletimer-bot.herokuapp.com/";
+const URL = process.env.URL || "https://simpletimer-bot.herokuapp.com:8443/";
 
 const Telegraf = require("telegraf");
 const { Extra, Markup } = Telegraf;
