@@ -138,10 +138,10 @@ const intervalHandler = ctx => {
         ctx.telegram.sendMessage(
           ctx.chat.id,
           "⌛️Time's up:<b>" +
-            (t.label.length > 0 ? " " + t.label : "") +
             " " +
             millisToMinutesAndSeconds(t.time) +
-            "</b><i> — no label</i>",
+            (t.label.length > 0 ? " — <i>" + t.label + "</i>" : "<i> — no label</i>") +
+            "</b>",
           {
             parse_mode: "HTML",
             reply_to_message_id: `${ctx.message.message_id}`
