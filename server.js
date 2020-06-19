@@ -132,6 +132,7 @@ const intervalHandler = ctx => {
     //console.log(timeRest)
     if (timeRest <= 0) {
       if (!t.invalidated) {
+        session.snooze = 0
         //stopTimers(ctx)
         //ctx.editMessageText("⏳Timer(s) stopped 🛑")
         t.invalidated = true;
