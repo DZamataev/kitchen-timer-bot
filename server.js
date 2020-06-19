@@ -140,8 +140,8 @@ const intervalHandler = ctx => {
           "⌛️Time's up:<b>" +
             " " +
             millisToMinutesAndSeconds(t.time) +
-            (t.label.length > 0 ? " — <i>" + t.label + "</i>" : "<i> — no label</i>") +
-            "</b>",
+            (t.label.length > 0 ? " — " + t.label + "</b>" : "</b><i> — no label</i>") +
+            " ",
           {
             parse_mode: "HTML",
             reply_to_message_id: `${ctx.message.message_id}`
