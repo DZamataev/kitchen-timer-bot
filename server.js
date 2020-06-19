@@ -224,7 +224,7 @@ bot.action("stop", ctx => {
 });
 
 bot.action("snooze", ctx => {
-  session.snooze = session.snooze + 10;
+  session.snooze = session.snooze + 1;
   ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
 });
 
