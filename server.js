@@ -264,9 +264,9 @@ function getSessionKey(ctx) {
   return null;
 }
 
-bot.telegram.setWebhook(`${process.env.URL}/bot${process.env.BOT_TOKEN}`);
+/*bot.telegram.setWebhook(`${process.env.URL}/bot${process.env.BOT_TOKEN}`);
 bot.startWebhook(`/bot${process.env.BOT_TOKEN}`, null, process.env.PORT);
 bot.launch();
-
+*/
 //Start bot polling in order to not terminate Node.js application.
-//bot.startPolling();
+bot.startPolling();
