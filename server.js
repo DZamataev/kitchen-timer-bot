@@ -131,7 +131,7 @@ const intervalHandler = ctx => {
     //console.log(timeRest)
     if (timeRest <= 0) {
       if (!t.invalidated) {
-        session.snooze = 0
+
         //stopTimers(ctx)
         //ctx.editMessageText("⏳Timer(s) stopped 🛑")
         t.invalidated = true;
@@ -139,7 +139,7 @@ const intervalHandler = ctx => {
           ctx.chat.id,
           "⌛️Time's up:<b>" +
             " " +
-            millisToMinutesAndSeconds(t.time) +
+            millisToMinutesAndSeconds(t.time) +"(+💤 "+session.snooze +"m)" +
             (t.label.length > 0 ? " — " + t.label + "</b>" : "</b><i> — no label</i>") +
             " ",
           {
@@ -147,6 +147,7 @@ const intervalHandler = ctx => {
             reply_to_message_id: `${ctx.message.message_id}`
           }
         );
+        session.snooze = 0
       }
     }
     reply +=
