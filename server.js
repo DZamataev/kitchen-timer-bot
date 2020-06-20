@@ -123,9 +123,6 @@ session.snooze = 0;
 const intervalHandler = ctx => {
   var reply = "";
   var invalidatedCount = 0;
-  if(ctx.chat.type === "group" ||
-    ctx.chat.type === "supergroup" )
-    ctx.telegram.pinChatMessage(ctx.chat.id, ctx.message.message_id)
   ctx.session.timers.forEach(t => {
     if(session.snooze != 0) {
       var timeRest = (t.end - Date.now()) + (session.snooze * 60000);
@@ -193,6 +190,9 @@ const intervalHandler = ctx => {
         ctx.session.editInlineMessageId = replyCtx.inline_message_id;
         ctx.session.editMessageChatId = replyCtx.chat.id;
         ctx.session.canEdit = true;
+        if(ctx.chat.type === "group" ||
+            ctx.chat.type === "supergroup" )
+          ctx.telegram.pinChatMessage(ctx.chat.id, replyCtx.message_id)
       });
     }
   } else {
