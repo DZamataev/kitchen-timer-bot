@@ -12,7 +12,7 @@ app.listen(process.env.PORT);
 }, 240000);*/
 
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8443;
 const URL = process.env.URL || "https://simpletimer-bot.herokuapp.com:8443/";
 
 const Telegraf = require("telegraf");
@@ -46,11 +46,12 @@ bot.start(ctx => {
 
 Usage:
 
-Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
+Send <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
 However, you can create multiple timers using the same command and have them running simultaneously.
 
-For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
-`,
+For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>.
+
+You can now snooze a timer for 10 minutes by pressing the Snooze💤 button. Snooze button can be used multiple times.`,
     { parse_mode: "HTML" }
   );
 });
@@ -62,11 +63,12 @@ bot.help(ctx => {
 
 Usage:
 
-Enter <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
+Send <b>/&lt;minutes&gt; [label]</b> to create a new timer. Give the number of minutes till the timer runs out with an optional label.
 However, you can create multiple timers using the same command and have them running simultaneously.
 
-For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>. 
-`,
+For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>walk</i>.
+
+You can now snooze a timer for 10 minutes by pressing the Snooze💤 button. Snooze button can be used multiple times.`,
     { parse_mode: "HTML" }
   );
 });
@@ -74,13 +76,13 @@ For eg., <code>/10 walk</code> will create a timer for 10 minutes with label <i>
 bot.command("stop", ctx => {
   session.snooze = 0 
   stopTimers(ctx);
-  return ctx.reply("Stopped all timers.");
+  return ctx.reply("Stopped all timers 🛑");
 });
 
 bot.command("cancel", ctx => {
   session.snooze = 0
   stopTimers(ctx);
-  return ctx.reply("Stopped all timers.");
+  return ctx.reply("Stopped all timers 🛑");
 });
 
 bot.command(ctx => {
@@ -139,7 +141,7 @@ const intervalHandler = ctx => {
           ctx.chat.id,
           "⌛️Time's up:<b>" +
             " " +
-            millisToMinutesAndSeconds(t.time) +"(+💤 "+session.snooze +"m)" +
+            millisToMinutesAndSeconds(t.time) + (session.snooze > 0 ? " (+"+session.snooze +"m💤)" : "") +
             (t.label.length > 0 ? " — " + t.label + "</b>" : "</b><i> — no label</i>") +
             " ",
           {
