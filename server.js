@@ -85,7 +85,6 @@ bot.command("cancel", ctx => {
 
 bot.command(ctx => {
   ctx.telegram.sendChatAction(ctx.chat.id, "typing");
-  n++;
   var msg = ctx.message.text;
   if (/^\/\d{1,5}/.test(msg)) {
     var match = msg.match(/^\/\d{1,5}/);
@@ -118,12 +117,15 @@ bot.command(ctx => {
   }
 });
 
-var n = -1;
+//snooze variable
 session.snooze = 0;
 
 const intervalHandler = ctx => {
   var reply = "";
   var invalidatedCount = 0;
+  if(ctx.chat.type === "group" ||
+    ctx.chat.type === "supergroup" )
+    ctx.telegram.pinChatMessage(ctx.chat.id, ctx.message.message_id)
   ctx.session.timers.forEach(t => {
     if(session.snooze != 0) {
       var timeRest = (t.end - Date.now()) + (session.snooze * 60000);
@@ -225,12 +227,9 @@ bot.action("stop", ctx => {
 });
 
 bot.action("snooze", ctx => {
-  session.snooze = session.snooze + 1;
+  session.snooze = session.snooze + 10;
   ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
 });
-
-
-
 
 function millisToMinutesAndSeconds(millis) {
   //var minus = millis < 0 ? "-" : "";
