@@ -87,6 +87,7 @@ bot.command("cancel", ctx => {
 
 bot.command(ctx => {
   ctx.telegram.sendChatAction(ctx.chat.id, "typing");
+  session.snooze = 0
   var msg = ctx.message.text;
   if (/^\/\d{1,5}/.test(msg)) {
     var match = msg.match(/^\/\d{1,5}/);
