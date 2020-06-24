@@ -150,7 +150,10 @@ const intervalHandler = ctx => {
             reply_to_message_id: `${ctx.message.message_id}`
           }
         );
+        //reset snooze time when timer ends
         session.snooze = 0
+        //unpin timer message after it ends
+        ctx.telegram.unpinChatMessage(ctx.chat.id)
       }
     }
     reply +=
