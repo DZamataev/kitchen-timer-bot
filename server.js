@@ -42,7 +42,7 @@ bot.use(session());
 bot.start(ctx => {
   ctx.telegram.sendMessage(
     ctx.chat.id,
-    `I am a simple timer bot. 
+    `I am Snoozy Timer.
 
 Usage:
 
@@ -59,7 +59,7 @@ You can now snooze a timer for 10 minutes by pressing the Snooze💤 button. Sno
 bot.help(ctx => {
   ctx.telegram.sendMessage(
     ctx.chat.id,
-    `I am a simple timer bot. 
+    `I am Snoozy Timer. 
 
 Usage:
 
@@ -266,6 +266,8 @@ function stopTimers(ctx) {
   m_activeContexts[sessionKey] = null;
   ctx.session.canEdit = false;
   ctx.session.timers = [];
+  //unpin after the timer is stopped
+  ctx.telegram.unpinChatMessage(ctx.chat.id, replyCtx.message_id)
 }
 
 function getSessionKey(ctx) {
