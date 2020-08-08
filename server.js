@@ -234,9 +234,14 @@ bot.action("stop", ctx => {
 });
 
 bot.action("snooze", ctx => {
-  session.snooze = session.snooze + 10;
+  snooze(ctx)
   ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
 });
+
+function snooze(ctx)
+{
+  session.snooze = session.snooze + 10;
+}
 
 function millisToMinutesAndSeconds(millis) {
   //var minus = millis < 0 ? "-" : "";
@@ -266,8 +271,6 @@ function stopTimers(ctx) {
   m_activeContexts[sessionKey] = null;
   ctx.session.canEdit = false;
   ctx.session.timers = [];
-  //unpin after the timer is stopped
-  //ctx.telegram.unpinChatMessage(ctx.chat.id, replyCtx.message_id)
 }
 
 function getSessionKey(ctx) {
