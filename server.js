@@ -267,9 +267,7 @@ function stopTimers(ctx) {
   ctx.session.canEdit = false;
   ctx.session.timers = [];
   //unpin after the timer is stopped
-  if(ctx.chat.type === "group" ||
-            ctx.chat.type === "supergroup" )
-  ctx.telegram.unpinChatMessage(ctx.chat.id, replyCtx.message_id)
+  //ctx.telegram.unpinChatMessage(ctx.chat.id, replyCtx.message_id)
 }
 
 function getSessionKey(ctx) {
