@@ -1,0 +1,7 @@
+.env
+.glitch-assets
+development.log
+ftg-install.log
+log
+server.js.save
+node_modules
