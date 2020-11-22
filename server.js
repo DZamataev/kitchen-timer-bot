@@ -236,8 +236,16 @@ bot.action("stop", ctx => {
 });
 
 bot.action("snooze", ctx => {
-  snooze(ctx)
-  ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
+  ctx.telegram.getChatMember(ctx.chat.id, ctx.from.id).then(function(chatMember) { 
+    if (chatMember.status == "administrator" || chatMember.status == "creator")
+    {
+      snooze(ctx)
+      ctx.answerCbQuery("Snoozed all timers by 10 minutes.");
+    }
+    else
+      ctx.answerCbQuery('You need to be an admin to do this!');
+  });
+  
 });
 
 function snooze(ctx)
